@@ -17,7 +17,7 @@ app.use(cors({
 //   optionsSuccessStatus: 200,
 // };
 
-app.use(cors(corsOptions));
+
 // app.use("/get", form)
 app.use("/form",form) 
 app.use("/applicants", applicants) 
