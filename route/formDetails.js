@@ -26,8 +26,9 @@ router.get("/get/:id", (req, res) => {
 
 router.post("/post", (req, res) => {
   const formData = req.body;
-  console.log(formData)
-  
+  console.log(formData);
+  formData.approved = false;
+
   FormData.create(formData)
     .then((createdForm) => {
       console.log("Form data saved successfully");
@@ -35,6 +36,26 @@ router.post("/post", (req, res) => {
     })
     .catch((error) => {
       console.error("Error saving form data:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+// Assume your backend route is "/students"
+
+// Route to update the approval status for a specific applicant
+router.put("/approve-applicant/:id", (req, res) => {
+  const applicantId = req.params.id;
+
+  // Find the applicant by ID and update the approval status to true
+  FormData.findByIdAndUpdate(applicantId, { approved: true }, { new: true })
+    .then((updatedApplicant) => {
+      if (!updatedApplicant) {
+        return res.status(404).json({ error: "Applicant not found" });
+      }
+
+      res.json(updatedApplicant);
+    })
+    .catch((error) => {
+      console.error("Error updating applicant:", error);
       res.status(500).json({ error: "Internal server error" });
     });
 });
@@ -90,7 +111,7 @@ router.get("/get/:id/download", async (req, res) => {
 
         res.setHeader('Content-Length', stat.size);
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=form.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=form.pdf'); 
 
         fileStream.pipe(res);
 

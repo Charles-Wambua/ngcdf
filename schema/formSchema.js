@@ -20,6 +20,7 @@ const formDataSchema = new mongoose.Schema({
   fatherIncome: String,
   motherIncome: String,
   applicationDate: String,
+  approved: { type: Boolean, default: false },
 });
 
 const FormData = mongoose.model("FormData", formDataSchema);
