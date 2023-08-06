@@ -59,6 +59,23 @@ router.put("/approve-applicant/:id", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+router.put("/decline-applicant/:id", (req, res) => {
+  const applicantId = req.params.id;
+
+  // Find the applicant by ID and update the approval status to true
+  FormData.findByIdAndUpdate(applicantId, { approved: false }, { new: true })
+    .then((updatedApplicant) => {
+      if (!updatedApplicant) {
+        return res.status(404).json({ error: "Applicant not found" });
+      }
+
+      res.json(updatedApplicant);
+    })
+    .catch((error) => {
+      console.error("Error updating applicant:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
 function generatePdf(formData) {
   const doc = new PDFDocument();
 
