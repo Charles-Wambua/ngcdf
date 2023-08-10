@@ -24,21 +24,40 @@ router.get("/get/:id", (req, res) => {
     });
 });
 
-router.post("/post", (req, res) => {
+router.post('/post', async (req, res) => {
   const formData = req.body;
   console.log(formData);
   formData.approved = false;
 
-  FormData.create(formData)
-    .then((createdForm) => {
-      console.log("Form data saved successfully");
-      res.json({ id: createdForm._id, message: "Form submitted successfully" });
-    })
-    .catch((error) => {
-      console.error("Error saving form data:", error);
-      res.status(500).json({ error: "Internal server error" });
-    });
+  try {
+    const query = {};
+  
+    if (formData.id) {
+      query.id = formData.id;
+    }
+  
+    if (formData.birthCertificate) {
+      query.birthCertificate = formData.birthCertificate;
+    }
+  
+    const existingForm = await FormData.findOne(query);
+  
+    if (existingForm) {
+      // If the form already exists, send a response indicating duplicate registration
+      return res.status(400).json({ error: 'You are already registered with this ID or Birth Certificate.' });
+    }
+  
+    // If the form does not exist, create the new form data
+    const createdForm = await FormData.create(formData);
+    console.log('Form data saved successfully');
+    return res.json({ id: createdForm._id, message: 'Form submitted successfully' });
+  } catch (error) {
+    console.error('Error saving form data:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+  
 });
+
 // Assume your backend route is "/students"
 
 // Route to update the approval status for a specific applicant
@@ -59,10 +78,44 @@ router.put("/approve-applicant/:id", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+router.put('/:id/action', async (req, res) => {
+  const applicantId = req.params.id;
+  const action = req.body.action; // Assuming the action is sent in the request body
+
+  if (action === "approve") {
+    FormData.findByIdAndUpdate(applicantId, { approved: true }, { new: true })
+      .then((updatedApplicant) => {
+        if (!updatedApplicant) {
+          return res.status(404).json({ error: "Applicant not found" });
+        }
+
+        res.json(updatedApplicant);
+      })
+      .catch((error) => {
+        console.error("Error updating applicant:", error);
+        res.status(500).json({ error: "Internal server error" });
+      });
+  } else if (action === "decline") {
+    FormData.findByIdAndUpdate(applicantId, { approved: false }, { new: true })
+      .then((updatedApplicant) => {
+        if (!updatedApplicant) {
+          return res.status(404).json({ error: "Applicant not found" });
+        }
+
+        res.json(updatedApplicant);
+      })
+      .catch((error) => {
+        console.error("Error updating applicant:", error);
+        res.status(500).json({ error: "Internal server error" });
+      });
+  } else {
+    res.status(400).json({ error: "Invalid action" });
+  }
+});
 router.put("/decline-applicant/:id", (req, res) => {
   const applicantId = req.params.id;
 
-  // Find the applicant by ID and update the approval status to true
+  // Find the applicant by ID and update the approval status to false
   FormData.findByIdAndUpdate(applicantId, { approved: false }, { new: true })
     .then((updatedApplicant) => {
       if (!updatedApplicant) {

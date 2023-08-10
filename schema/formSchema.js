@@ -4,6 +4,7 @@ const formDataSchema = new mongoose.Schema({
   name: String,
   gender: String,
   id: String,
+  birthCertificate: String,
   institution: String,
   admRegNo: String,
   studyYear: String,
@@ -22,6 +23,9 @@ const formDataSchema = new mongoose.Schema({
   applicationDate: String,
   approved: { type: Boolean, default: false },
 });
+
+
+
 
 const FormData = mongoose.model("FormData", formDataSchema);
 
