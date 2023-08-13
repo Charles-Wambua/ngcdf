@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 //   origin: 'http://192.168.0.15'
 // }));
 const corsOptions = {
-  origin: 'https://machakoscdf-api.onrender.com', 
+  origin: 'https:// .onrender.com', 
   optionsSuccessStatus: 200,
 };
 

@@ -28,6 +28,11 @@ const upload = multer({ storage });
 router.post('/submit',upload.array('images', 4), async (req, res) => {
   req.setTimeout(0);
   try {
+    const existingApplication = await Application.findOne({ birthCertificate: req.body.birthCertificate });
+
+    if (existingApplication) {
+      return res.status(400).json({ message: 'This birth certificate has already been submitted' });
+    }
     const newApplication = new Application({
       name: req.body.name,
       gender: req.body.gender,
@@ -49,6 +54,7 @@ router.post('/submit',upload.array('images', 4), async (req, res) => {
       images: req.files.map(file => file.path),
       approved: false,
     });
+    
     const savedApplication = await newApplication.save();
     res.status(201).json({ id: savedApplication._id });
 
