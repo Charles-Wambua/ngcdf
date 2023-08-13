@@ -26,7 +26,7 @@ router.get("/get/:id", (req, res) => {
 
 router.post('/post', async (req, res) => {
   const formData = req.body;
-  console.log(formData);
+  // console.log(formData);
   formData.approved = false;
 
   try {
